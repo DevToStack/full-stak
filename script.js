@@ -1,7 +1,8 @@
 const input = document.getElementById("cityInput");
 const suggestions = document.getElementById("suggestions");
-let lat = 0
-let lon = 0
+let lat = null;
+let lon = null;
+
 input.addEventListener("input", async () => {
     const query = input.value.trim();
     if (query.length < 2) {
@@ -10,29 +11,44 @@ input.addEventListener("input", async () => {
     }
 
     try {
-        const url = `https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=15`;
-        const res = await fetch(url, {
-            headers: { "User-Agent": "demo-app" } // Nominatim requires a user-agent
+        const response = await fetch(`https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=15`, {
+            headers: {
+                "User-Agent": "YourAppName/1.0 (your-email@example.com)" // required by Nominatim usage policy
+            }
         });
-        const data = await res.json();
 
+        if (!response.ok) throw new Error("Network error: " + response.status);
+
+        const data = await response.json();
         suggestions.innerHTML = "";
+
         if (data.length > 0) {
+            // If user never clicks a suggestion, take the first one
+            lat = data[0].lat;
+            lon = data[0].lon;
+            console.log("Default selected (first match):", {
+                lat,
+                lon,
+                name: data[0].display_name
+            });
+
             data.forEach(place => {
                 const li = document.createElement("li");
                 li.textContent = place.display_name;
                 li.addEventListener("click", () => {
                     input.value = place.display_name;
-                    console.log("hi")
-                    suggestions.style.display = "none";
-                    console.log("Selected:", {
-                        lat: place.lat,
-                        lon: place.lon,
+                    lat = place.lat;
+                    lon = place.lon;
+                    console.log("User selected:", {
+                        lat,
+                        lon,
                         name: place.display_name
                     });
+                    suggestions.style.display = "none";
                 });
                 suggestions.appendChild(li);
             });
+
             suggestions.style.display = "block";
         } else {
             suggestions.style.display = "none";
@@ -47,6 +63,7 @@ document.addEventListener("click", (e) => {
         suggestions.style.display = "none";
     }
 });
+
 
 
 async function loadCountries() {
@@ -174,7 +191,7 @@ async function getCityName(lat, lon) {
 }
 
 // Example usage
-getCityName(12.97, 77.59).then(city => {
+getCityName(3, 77.59).then(city => {
     console.log("City:", city); // Bengaluru
     document.querySelector(".header h2").textContent = city;
 });
