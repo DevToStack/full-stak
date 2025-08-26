@@ -176,7 +176,7 @@ function getWeatherIcon(code) {
 // === Run when page loads ===
 // Example: Bengaluru (12.97, 77.59)
 document.addEventListener("DOMContentLoaded", () => {
-    fetchWeather(12.97, 77.59);
+    fetchWeather(lat, lon);
 });
   
 
