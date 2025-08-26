@@ -11,9 +11,10 @@ input.addEventListener("input", async () => {
     }
 
     try {
-        const response = await fetch(`https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=15`, {
+        
+        const response = await fetch(`https://api.teleport.org/api/cities/?search=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=15`, {
             headers: {
-                "User-Agent": "YourAppName/1.0 (your-email@example.com)" // required by Nominatim usage policy
+                "User-Agent": "Wheather/1.0 (rabimohammed740@gmail.com)" // required by Nominatim usage policy
             }
         });
 
